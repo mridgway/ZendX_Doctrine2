@@ -1,0 +1,6 @@
+[submodule "vendor/ZendFramework"]
+	path = vendor/ZendFramework
+	url = git://github.com/mridgway/Zend-Framework-1.10-Mirror.git
+[submodule "vendor/Doctrine2"]
+	path = vendor/Doctrine2
+	url = git://github.com/doctrine/doctrine2.git
