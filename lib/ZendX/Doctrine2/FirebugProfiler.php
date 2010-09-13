@@ -37,7 +37,7 @@ class FirebugProfiler
 
     /**
      * Sum of query times
-     * 
+     *
      * @var float
      */
     protected $_totalMS = 0;
@@ -56,6 +56,11 @@ class FirebugProfiler
      */
     protected $_message;
 
+    /**
+     * @var stdClass
+     */
+    protected $_curQuery = null;
+
     public function __construct()
     {
         $this->_message = new \Zend_Wildfire_Plugin_FirePhp_TableMessage('Doctrine Queries');
@@ -70,17 +75,25 @@ class FirebugProfiler
      * @param array $params Arguments for SQL
      * @param float $executionMS Time for query to return
      */
-    public function logSQL($sql, array $params = null, $executionMS = null)
+    public function startQuery($sql, array $params = null, array $types = null)
     {
+        $this->_curQuery = new \stdClass();
+        $this->_curQuery->sql = $sql;
+        $this->_curQuery->params = $params;
+        $this->_curQuery->types = $types;
+        $this->_curQuery->startTime = \microtime(true);
+    }
+
+    public function stopQuery()
+    {
+        $executionMS = \microtime(true) - $this->_curQuery->startTime;
         $this->_totalMS += $executionMS;
         ++$this->_queryCount;
-
         $this->_message->addRow(array(
             number_format($executionMS, 5),
-            $sql,
-            $params
+            $this->_curQuery->sql,
+            $this->_curQuery->params
         ));
-
         $this->updateLabel();
     }
 
