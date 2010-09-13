@@ -138,11 +138,11 @@ class FormMediator
             }
             return $this->callMethod($instance, $method, $args);
 
-        } else if (is_callable($method)) {
+        } else if (is_string($method)) {
+            return call_user_func_array(array($instance, $method), $args);
+        } else {
             $args = array_merge(array($instance), $args);
             return call_user_func_array($method, $args);
-        } else {
-            return call_user_func_array(array($instance, $method), $args);
         }
     }
 
@@ -181,6 +181,18 @@ class FormMediator
         $instance = $this->getInstance();
 
         $values = $this->_form->getValues($suppressArrayNotation);
+        $this->setData($values);
+
+        return $this->_instance;
+    }
+
+    /**
+     * Calls setters for each key with the given values
+     *
+     * @param array $values
+     */
+    public function setData(array $values)
+    {
         foreach ($this->_fields AS $name => $field) {
 
             if ($field['setMethod'] === false || !array_key_exists($name, $values)) {
@@ -190,21 +202,15 @@ class FormMediator
             $value = $values[$name];
 
             if ($field['filterMethod'] !== false) {
-                if (!method_exists($instance, $field['filterMethod'])) {
-                    throw new Zend_Form_Exception("Filter method for field ".$name." on ".$this->_className." does not exist!");
-                }
                 $filterMethod = $field['filterMethod'];
-                $value = $instance->$filterMethod($value);
+                $value = $this->callMethod($this->_instance, $filterMethod, array($value));
             }
 
             $set = $field['setMethod'];
             $this->callFieldSetMethod($field, $value);
 
         }
-
-        return $this->_instance;
     }
-
 
     /**
      * @param Zend_Form $form
