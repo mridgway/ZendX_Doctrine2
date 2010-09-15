@@ -47,7 +47,7 @@ class Paginator implements \Zend_Paginator_Adapter_Interface
             if (null === $this->_countQb) {
                 $this->_countQb = clone $this->_qb;
                 $from = $this->_countQb->getDqlPart('from');
-                $identifierNames = \Zend_Registry::get('doctrine')->getClassMetadata($from[0]->getFrom())->getIdentifierFieldNames();
+                $identifierNames = $this->_qb->getEntityManager()->getClassMetadata($from[0]->getFrom())->getIdentifierFieldNames();
                 $this->_countQb->select('count('.$this->_countQb->getRootAlias().'.' . $identifierNames[0] . ')');
             }
             return $this->_rowCount = $this->_countQb->getQuery()->getSingleScalarResult();
@@ -67,6 +67,11 @@ class Paginator implements \Zend_Paginator_Adapter_Interface
         return $this->_qb->getQuery()->getResult();
     }
 
+    /**
+     * Set a custom query builder to get the count
+     *
+     * @param Doctrine\ORM\QueryBuilder $qb
+     */
     public function setCountQueryBuilder(\Doctrine\ORM\QueryBuilder $qb)
     {
         $this->_countQb = $qb;
