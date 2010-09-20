@@ -32,7 +32,7 @@ namespace ZendX\Doctrine2;
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
 class FirebugProfiler
-    implements \Doctrine\DBAL\Logging\SqlLogger
+    implements \Doctrine\DBAL\Logging\SQLLogger
 {
 
     /**
